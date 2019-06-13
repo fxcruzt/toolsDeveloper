@@ -1,0 +1,15 @@
+stages:  
+  - deploy
+
+cache:
+  paths:
+    - vendor
+
+upload:
+  stage: deploy
+  image: mwienk/docker-lftp:latest
+  script:
+    - lftp -e "set ftp:ssl-allow false; set ftp:use-feat false; mirror -eRnv ./ ./httpdocs  --ignore-time --parallel=10 --exclude-glob .git* --exclude .git/; exit;" -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST
+  only:
+    - master
+  when: on_success
